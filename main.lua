@@ -1,5 +1,4 @@
 --/ ---------------------------------------------
---/         Gamecodeur Weekex Crafting
 --/               BACK TO SPACE
 --/ ---------------------------------------------
 --/ Editor : Alpha Kilo - Games Studio
@@ -7,16 +6,12 @@
 --/ As Xoran Sorvor - xoran@xoransorvor.be
 --/ Website : www.alphakilo.games
 --/ Date : 2021
---/ Version : v0.0.1    16/01/2021 21:59
+--/ Version : v1.0.0    17/01/2021 17:22
 --/ ---------------------------------------------
 --/ External Library:
 --/ CRON : https://github.com/kikito/cron.lua
 --/ ---------------------------------------------
---/ Colors Table
---/ rgb(194,243,30) vert lime (0.76, 0.95, 0.11)
---/ rgb(255,100,100) rouge fraise (1, 0.39, 0.39)
---/ rgb(255,81,0) orange (1, 0.32, 0)
---/ ---------------------------------------------
+
 
 --/ ----------------------------------------------------
 --/ INIT -----------------------------------------------
@@ -30,7 +25,7 @@ io.stdout:setvbuf('no')
 love.graphics.setDefaultFilter("nearest")
 
 --/ Chargement de la librairie de debugging si le mode est actif
-local modeDebug = true    -- true or false
+local modeDebug = false    -- true or false
 if modeDebug then
   --/ Chargement de la librairie libDebug (Debugging Lib)
   oDBG = require("libs/libDebug")
@@ -50,10 +45,14 @@ displayStatus = 0
 --/ Affichage des messages dynamiques
 displayShow = true
 
+--/ Soluce du jeu
 soluce = nil
 
+--/ Restart du jeu
+restart = false
+
 --/ Configuration de la génération de nombres aléatoires
---/ math.randomseed(love.timer.getTime())
+math.randomseed(love.timer.getTime())
 
 --/ ----------------------------------------------------
 --/ LOVE LOAD ------------------------------------------
@@ -88,19 +87,23 @@ end
 --/ ----------------------------------------------------
 function love.draw()
   
+  --/ Couleurs
+  local colorOrange = {1, 0.32, 0, 1} 
+  local colorWhite = {1, 1, 1, 1}
+  local colorGreen = {0.76, 0.95, 0.11, 1}
+
   oLAP.drawObjectsList(oLAP.objects.index)
   oLAP.drawPresentation() 
   oLAP.drawHUDInfosObject(oLAP.objects.index)
   oLAP.drawHUDSelection()
   oLAP.drawObjectsListSelected()
 
-    --/DEBUG/AFFICHE TOUCHE PRESSEE : oLAP.drawMessage(keypressed, 500, 500)
+  --/DEBUG/AFFICHE TOUCHE PRESSEE : oLAP.drawMessage(keypressed, 500, 500)
 
   if(table.getn(oLAP.selectedObjects) >= 5) then
-    local colorOrange = {1, 0.32, 0, 1} -- orange Alpha 1
-    local colorWhite = {1, 1, 1, 1} -- orange Alpha 1
     oLAP.drawMessage("Votre inventaire est plein", 475, 390, colorOrange)
-    oLAP.drawMessage("Appuyez sur C pour tester votre solution", 420, 410, colorWhite)
+    oLAP.drawMessage("Appuye sur \"C\" pour tester ta solution", 425, 410, colorWhite)    
+    oLAP.drawMessage("(Il existe 10 solutions différentes)", 440, 430, colorWhite)    
   else 
     if displayShow then
       if displayStatus == 1 then        
@@ -109,10 +112,27 @@ function love.draw()
     end
   end
 
-  --/ Si on a solution on l'affiche@
-  if soluce ~= nil then
-    oLAP.drawMessage(soluce, 430, 470) 
+  --/ Gestiond du message affiché à l'issue du Crafting
+  if soluce ~= nil and restart == false then
+    if soluce[0] then
+      color = colorGreen
+      oLAP.drawMessage("YOU WIN :)", 15, 500, color) 
+    else
+      oLAP.drawMessage("YOU LOST :(", 15, 500, color) 
+      color = colorWhite
+    end 
+
+    oLAP.drawMessage(soluce[1], 15, 520, color) 
+    oLAP.drawMessage("Appuye sur la touche \"R\" pour tester une autre solution", 15, 540, colorOrange)
   end
+
+  --/  Debug section -----------------------------------
+  if modeDebug then    
+    --/ Display Debug Zone
+    oDBG.draw(sDebug, 400, 500, "yellow")
+  end --/ End Debug section ------------------------------
+
+  
 
 
 end
@@ -156,10 +176,17 @@ function love.keypressed(key)
   if key == 'c' then
     if(table.getn(oLAP.selectedObjects) == 5) then
       checkSoluce()
+      restart = false
     else
       displayStatus = 1 -- au moins 5 objets
       loadDisplayCounter(3)  -- pendant 3sec
     end
+  end
+
+  --/ L'appui sur la touche C calcule la solution du jeu
+  if key == 'r' then
+    oLAP.restart()
+    restart = true
   end
 
   if key == "escape" then

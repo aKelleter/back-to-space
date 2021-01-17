@@ -1,18 +1,18 @@
 # Back To Space 
 
 ### [English description]
+A small game whose objective is to put in its inventory the right items to send our alien back into space.
 
-Prototype of a small game whose objective is to put in its inventory the right items to send our alien back into space.
+10 possible solutions
 
 ### [French description]
+Un mini jeu dont l'objectif est de mettre dans son inventaire les bons objets pour renvoyer notre extraterrestre dans l'espace.
 
-Prototype d'un petit jeu dont l'objectif est de mettre dans son inventaire les bons objets pour renvoyer notre extraterrestre dans l'espace.
+10 solutions possibles
 
 ### [General informations]
 
-**Warning, actually this source code is not functionnal, for developper only  (this project is under development).**
-
-* Version : 0.0.1 
+* Version : 1.0.0  - 17/01/2020
 * Environment : Lua / LÔVE2D
 * License : GNU GPL v3 (see LICENSE file)
 

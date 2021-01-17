@@ -1,5 +1,4 @@
 --/ ---------------------------------------------
---/         Gamecodeur Weekex Crafting
 --/               BACK TO SPACE
 --/ ---------------------------------------------
 --/ Editor : Alpha Kilo - Games Studio
@@ -7,12 +6,7 @@
 --/ As Xoran Sorvor - xoran@xoransorvor.be
 --/ Website : www.alphakilo.games
 --/ Date : 2021
---/ Version : v0.0.1    10/01/2021 21:42
---/ ---------------------------------------------
---/ Colors Table
---/ rgb(194,243,30) vert lime (0.76, 0.95, 0.11)
---/ rgb(255,100,100) rouge fraise (1, 0.39, 0.39)
---/ rgb(255,81,0) orange (1, 0.32, 0)
+--/ Version : v1.0.0    17/01/2021 17:22
 --/ ---------------------------------------------
 
 --/ Init de la librairie 

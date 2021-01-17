@@ -1,5 +1,4 @@
 --/ ---------------------------------------------
---/         Gamecodeur Weekex Crafting
 --/               BACK TO SPACE
 --/ ---------------------------------------------
 --/ Editor : Alpha Kilo - Games Studio
@@ -7,7 +6,10 @@
 --/ As Xoran Sorvor - xoran@xoransorvor.be
 --/ Website : www.alphakilo.games
 --/ Date : 2021
---/ Version : v0.0.1    16/01/2021 21:59
+--/ Version : v1.0.0    17/01/2021 17:22
+--/ ---------------------------------------------
+--/ External Library:
+--/ CRON : https://github.com/kikito/cron.lua
 --/ ---------------------------------------------
 --/ Colors Table
 --/ rgb(194,243,30) vert lime (0.76, 0.95, 0.11)
@@ -19,12 +21,14 @@
 local LBAp = {}
 
 --/ Déclaration et intialisation des propriétés de la librairie
-local window = {}         -- Paramètres de la fenêtre
+local window = {}                        -- Paramètres de la fenêtre
 
 --/ Définition des Constantes
-local DEF_W_TITLE = "Gamecodeur WeekEx Crafting - Back To Space v0.0.1"     -- Titre fenêtre
-local DEF_W_WIDTH = 900     -- Largeur fenêtreà
-local DEF_W_HEIGHT = 600     -- Hauteur fenêtre
+local version = "1.0.0"
+local DEF_W_TITLE = "Back To Space"      -- Titre fenêtre
+local DEF_W_WIDTH = 900                  -- Largeur fenêtreà
+local DEF_W_HEIGHT = 600                 -- Hauteur fenêtre
+
 
 LBAp.objects = {}
 
@@ -101,14 +105,70 @@ function LBAp.removeObject(pIndex)
 end
 
 function LBAp.checkCraftingSoluce()
---[[
-  local soluce = {10,11,17,18,19}
-  for s = 1, 5 do
-    soluce[i]
-  end  
-]]
 
-return "Voici la solution"
+  local objExist = 0
+  
+  local soluces = {}
+  soluces[1] = {{10,11,17,18,19},{"Notre ami extraterrestre retourne chez lui à la façon d'un blockbuster Hollywoodien. Merci Bruce Willis!"}} -- Film hollywoodien 
+  soluces[2] = {{8,9,10,11,17},{"\"ET\" est venu chercher une femme et un chien pour se faire une petit vie pépère de retour chez lui (ou pas) :)"}}     -- Femme+chien = vie bien rangée
+  soluces[3] = {{10,11,12,15,17},{"E...Li...ot, \"ET\" téléphone maiiiiison..."}}   -- ET téléphone maison
+  soluces[4] = {{7,10,13,14,15},{"Mauvaise pioche pour notre extraterrestre, il va ramasser de sa race. On ne voudrait pas être à sa place"}}    -- Il va rammasser de sa race 
+  soluces[5] = {{1,2,3,4,5},{"Super et que vas-tu faire de tout ce bordel, il ne manquerait pas un bureau par hasard ?"}}        -- Il manque le bureau pour mettre tout ce bordel
+  soluces[6] = {{5,7,10,14,15},{"Ya petite fraulein, nous afons les moyens de fous faire parler hahahaha..."}}      -- Nous afons les moyens de fous faire parler
+  soluces[7] = {{8,10,14,18,19},{"Excellent choix, on tape tout ce petit monde sur un ring et on voit ce que cela donne... . Mode Fight Club ON"}}    -- Le club des cinq - Fight club
+  soluces[8] = {{10,11,14,16,20},{"Le tir au pigeon 2.0. Pool et un Extraterrestre un! Celui-là n'essayera pas de revenir avec ses potes au moins"}}   -- Le tir aux clays: tir au pigeon - cours forest
+  soluces[9] = {{6,7,8,10,12},{"Hmm c'est chaud ce soir, une meuf, un prédator et un bureau... Sex on the desk tonight!"}}      -- Sex on the desk
+  soluces[10] = {{3,10,11,17,20},{"Nom de dieu! ET se barre avec un rack server de chez Amazon et de quoi l'alimenter, il veut nous piquer nos données le fumier!"}}   -- ET a piqué un rack server chez Amazon et de quoi l'alimenter
+  
+  local failResponses = {}
+  failResponses = {
+                    {"Essaye à nouveau, tu y es presque mais tu as l'esprit un peu tordu!"},
+                    {"Non mais tu rigoles là?"},
+                    {"C'est du grand n'importe quoi!"},
+                    {"Franchement, autant ne pas essayer de trouver"},
+                    {"Alors celle-là je ne l'ai pas vue venir!"},
+                    {"Tu n'as même pas essayé de réfléchir"},
+                    {"Ma grand-mère aurait pû élaborer une meilleure solution"},
+                    {"Tu l'a fait les yeux fermes je parie"},
+                    {"J'ai l'impression qu'ET n'est pas prêt de partir"},
+                    {"Autant le tuer et le disséquer directement..."}
+                  }
+
+  local posInv = 1
+  local posTxt = 2
+
+  local response = {}
+  response = {{""},{""}}
+
+  --/ Boucle sur les solutions
+  for s = 1, 10 do
+    --/ Boucle sur les objets de la solution
+    for index,value in ipairs(soluces[s][posInv]) do
+      --/ Check si existe dans l'inventaire
+      objExist = objExist + checkObjExistInInventory(value)      
+    end
+    --/ Si on a gagné 
+    if objExist == 5 then
+      response[0] = true
+      response[1] = soluces[s][posTxt]
+      return response       
+    else
+      objExist = 0
+    end
+  end  
+
+  --/ Affiche un message "aléatoire" si on pas de bonne solution
+  local numResponse = love.math.random(1, 10)
+  response[0] = false
+  response[1] = failResponses[numResponse]
+
+  return response
+  
+end
+
+--/ Restart Game et réinitialisation
+function LBAp.restart()
+  LBAp.selectedObjects = {}
 end
 
 --/ ----------------------------------------------------
@@ -142,7 +202,7 @@ function LBAp.drawPresentation()
   love.graphics.rectangle("line", 1, 1, 899, 599)
   --/ Footer
   love.graphics.line(1, 570, 899, 570)
-  love.graphics.print("BACK TO SPACE v.0.0.1", 370 , 578)
+  love.graphics.print("BACK TO SPACE v"..version.." : Alpha Kilo - Games Studio", 280 , 578)
 end
 
 --/ Affiche l'icône reçu à la postion passée en paramètre
@@ -246,6 +306,22 @@ end --/ END FCT getWindow()
 --/ ----------------------------------------------------
 --/ SETTERS --------------------------------------------
 --/ ----------------------------------------------------
+
+--/ ----------------------------------------------------
+--/ PRIVATE --------------------------------------------
+--/ ----------------------------------------------------
+
+--/ PRIVATE : Vérifie si un objet existe
+function checkObjExistInInventory(pObjSoluce)
+
+  for index, objInventory in ipairs(LBAp.selectedObjects) do
+    --/ Si on trouve l'objet
+    if objInventory == pObjSoluce then
+      return 1    
+    end
+  end
+  return 0
+end
 
 --/ ----------------------------------------------------
 --/ LIB RETURN -----------------------------------------
